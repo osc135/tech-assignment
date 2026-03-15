@@ -50,6 +50,9 @@ namespace HijackPoker.Managers
             // Apply offsets to current state stacks
             ApplyStackOffsets();
 
+            // Fix dealer/SB/BB rotation (backend bug: always resets dealer to seat 1)
+            CorrectPositions();
+
             OnStateChanged?.Invoke(CurrentState);
 
             if (CurrentState?.Game?.IsHandComplete == true)
@@ -66,9 +69,33 @@ namespace HijackPoker.Managers
             {
                 if (_stackOffsets.TryGetValue(player.Seat, out float offset))
                 {
-                    player.Stack += offset;
+                    player.Stack = Math.Max(0f, player.Stack + offset);
                 }
             }
+        }
+
+        /// <summary>
+        /// The backend always resets dealer_seat to 1 on new game creation,
+        /// so the dealer never truly rotates. We fix this client-side by
+        /// computing the correct positions from the hand number (gameNo).
+        /// </summary>
+        private void CorrectPositions()
+        {
+            if (CurrentState?.Game == null || CurrentState.Players == null)
+                return;
+
+            var game = CurrentState.Game;
+            var activePlayers = CurrentState.Players
+                .Where(p => p != null)
+                .OrderBy(p => p.Seat)
+                .ToList();
+
+            if (activePlayers.Count < 2) return;
+
+            // Only rotate the dealer — SB/BB come from the backend
+            // since it controls who actually posts the blinds
+            int dealerIndex = (game.GameNo - 1) % activePlayers.Count;
+            game.DealerSeat = activePlayers[dealerIndex].Seat;
         }
 
         public bool HasState => CurrentState != null;

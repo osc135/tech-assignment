@@ -15,6 +15,7 @@ namespace HijackPoker.UI
         private readonly Label _actionLabel;
         private readonly Label _handRankLabel;
         private readonly Label _winningsLabel;
+        private readonly Label _positionChip;
         private readonly int _seatNumber;
 
         public SeatView(int seatNumber)
@@ -25,6 +26,11 @@ namespace HijackPoker.UI
             _root.AddToClassList("seat");
             _root.AddToClassList($"seat-{seatNumber}");
             _root.AddToClassList("empty");
+
+            // Position chip (SB / BB) — floats near the seat
+            _positionChip = new Label();
+            _positionChip.AddToClassList("position-chip");
+            _root.Add(_positionChip);
 
             // Single panel that contains EVERYTHING
             _panel = new VisualElement();
@@ -76,9 +82,11 @@ namespace HijackPoker.UI
             _root.EnableInClassList("all-in", player.IsAllIn);
             _root.EnableInClassList("winner", player.IsWinner);
 
-            // Name + position badge
-            string badge = GetPositionBadge(player.Seat, game);
-            _nameLabel.text = player.Username + badge;
+            // Name
+            _nameLabel.text = player.Username;
+
+            // Position chip (SB / BB near the seat)
+            RenderPositionChip(player.Seat, game);
 
             // Stack
             _stackLabel.text = MoneyFormatter.Format(player.Stack);
@@ -141,12 +149,34 @@ namespace HijackPoker.UI
             _actionLabel.AddToClassList($"action-{action.ToLower()}");
         }
 
-        private string GetPositionBadge(int seat, GameState game)
+        private void RenderPositionChip(int seat, GameState game)
         {
-            if (seat == game.DealerSeat) return " D";
-            if (seat == game.SmallBlindSeat) return " SB";
-            if (seat == game.BigBlindSeat) return " BB";
-            return "";
+            _positionChip.RemoveFromClassList("chip-dealer");
+            _positionChip.RemoveFromClassList("chip-sb");
+            _positionChip.RemoveFromClassList("chip-bb");
+
+            if (seat == game.DealerSeat)
+            {
+                _positionChip.text = "D";
+                _positionChip.AddToClassList("chip-dealer");
+                _positionChip.style.display = DisplayStyle.Flex;
+            }
+            else if (seat == game.SmallBlindSeat)
+            {
+                _positionChip.text = "SB";
+                _positionChip.AddToClassList("chip-sb");
+                _positionChip.style.display = DisplayStyle.Flex;
+            }
+            else if (seat == game.BigBlindSeat)
+            {
+                _positionChip.text = "BB";
+                _positionChip.AddToClassList("chip-bb");
+                _positionChip.style.display = DisplayStyle.Flex;
+            }
+            else
+            {
+                _positionChip.style.display = DisplayStyle.None;
+            }
         }
     }
 }

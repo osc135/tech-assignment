@@ -109,6 +109,43 @@
     color: var(--color-orange);
 }
 
+/* ── Position chips (SB / BB) ──────────────── */
+/* Floats on the felt between the seat and table center */
+.position-chip {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-radius: 13px;
+    font-size: 9px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: white;
+    border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Per-seat chip offset — toward the table center */
+.seat-1 .position-chip { bottom: -34px; left: 50%; translate: -13px 0; }
+.seat-2 .position-chip { bottom: -34px; left: 50%; translate: -13px 0; }
+.seat-3 .position-chip { top: 50%; left: -34px; translate: 0 -13px; }
+.seat-4 .position-chip { top: -34px; left: 50%; translate: -13px 0; }
+.seat-5 .position-chip { top: -34px; left: 50%; translate: -13px 0; }
+.seat-6 .position-chip { top: 50%; right: -34px; translate: 0 -13px; }
+
+.chip-sb {
+    background-color: rgb(21, 101, 192);
+}
+
+.chip-bb {
+    background-color: rgb(123, 31, 162);
+}
+
+.chip-dealer {
+    background-color: var(--color-gold);
+    color: rgb(30, 30, 30);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
 /* Hidden seat (empty) */
 .seat.empty {
     display: none;
