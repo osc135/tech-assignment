@@ -1,24 +1,28 @@
-# Unity Game Client — Skeleton Scripts
+# Hijack Poker — Unity Game Client (Option D)
 
-Starter scripts for **Option D: Unity Game Client**. These provide the data models and API client stub to get you up and running quickly.
+## Why Option D
 
-## Prerequisites
+I chose Option D because it plays to my game development interest while still requiring full-stack awareness. Working within a JS/Node backend repo, consuming REST APIs, and building a polished client on top gives me the chance to show range. It's also the most tangible option: a reviewer can start Docker, hit Play in Unity, and immediately see a working poker table. The other options are solid engineering challenges, but this one lets me demonstrate both technical depth and visual output.
 
-- **Unity 2022.3+ LTS** (or Unity 6) — [Download](https://unity.com/releases/editor/archive)
-- **Docker Desktop** with Docker Compose v2 — for the holdem-processor backend
-- **Git** — to clone this repo
+---
 
-## Setup
-
-### 1. Start the backend
+## Quick Start
 
 ```bash
-cd tech-assignment
+# 1. Start the backend
 cp .env.example .env
 docker compose --profile engine up -d
+
+# 2. Verify API is running
+curl http://localhost:3030/health
+
+# 3. Open Unity project
+#    Open unity-client/ in Unity 2022.3+ LTS or Unity 6
+
+# 4. Hit Play in the Unity Editor
 ```
 
-Verify it's running:
+The poker table connects to the backend automatically, shows connection status, and is ready to play.
 
 ---
 
@@ -86,45 +90,138 @@ Verify it's running:
 └─────────────────────────────────────┘
 ```
 
-### 2. Create a Unity project
-
-Open Unity Hub and create a new project:
-- Template: **3D (Core)** or **2D (Core)** — your choice
-- Name: whatever you like (e.g., `HijackPokerClient`)
-
-### 3. Install Newtonsoft JSON
-
-In Unity Editor:
-1. **Window > Package Manager**
-2. Click **+** > **Add package by name**
-3. Enter: `com.unity.nuget.newtonsoft-json`
-4. Click **Add**
-
-### 4. Import skeleton scripts
-
-Copy the contents of this `Scripts/` directory into your Unity project's `Assets/Scripts/`:
+### Data Flow
 
 ```
-Assets/
-└── Scripts/
-    ├── Api/
-    │   └── PokerApiClient.cs       # REST client stub (you'll implement the TODO methods)
-    └── Models/
-        ├── GameState.cs             # Game data models + API response wrappers
-        └── PlayerState.cs           # Player data model + status code constants
+User clicks "Next Step"
+  → ControlsView fires OnNextStep
+    → GameManager.AdvanceStep()
+      → POST /process (advance one step)
+      → GET /table/1 (fetch new state)
+      → TableStateManager.UpdateState()
+        → Corrects dealer position
+        → Applies stack offsets
+        → Fires OnStateChanged
+          → TableView renders all seats, cards, pot, HUD
+          → HandHistoryManager logs the step
 ```
 
-### 5. Build your scene
+---
 
-Create a scene with:
-- A Canvas for UI elements
-- A poker table layout (6 seats around an oval)
-- A `PokerApiClient` MonoBehaviour on a GameObject (configure `baseUrl` in the Inspector)
-- Controls: Next Step button, Auto Play toggle, Speed selector
+## Key Decisions
 
-### 6. Hit Play
+### UI Toolkit over uGUI
 
-With the Docker backend running, press Play in the Unity Editor. Click your Next Step button to advance the hand and see the table update.
+UI Toolkit fits this project better than uGUI because the poker table is essentially a data-driven display. USS stylesheets let me manage visual states like folded, all-in, and winner through class toggles instead of writing imperative code to change colors and opacity. The UXML/USS pattern also maps closely to HTML/CSS, which makes sense in a repo that already has a web-based reference viewer. uGUI would work fine, but it scatters styling across Inspector fields and code, which gets messy with this many visual states.
+
+### Plain C# Core, MonoBehaviour Only at Boundaries
+
+GameManager, TableStateManager, and HandHistoryManager are plain C# classes. Only GameBootstrap and PokerApiClient are MonoBehaviours, since they need Unity's lifecycle (Update loop for auto-play, UnityWebRequest for HTTP). This keeps the core logic testable in Edit Mode without spinning up a scene, which is why all unit tests run fast with simple mock injection.
+
+### IPokerApi Interface Extraction
+
+IPokerApi lets GameManager depend on an abstraction instead of the concrete PokerApiClient. This is what makes the GameManager tests possible — they inject a MockPokerApi that returns preset responses, so tests run without a backend or network. It also means swapping the HTTP implementation later (e.g., for WebSocket-based updates) wouldn't require changing any game logic.
+
+### Client-Side Dealer Rotation
+
+The backend has a bug where `dealer_seat` resets to 1 on every new game, so the dealer never rotates. Rather than modifying the backend (out of scope), the client computes the correct dealer position from `gameNo`: `dealerIndex = (gameNo - 1) % playerCount`. SB/BB are not corrected client-side since the backend controls who actually posts the blinds.
+
+### Full State Replace
+
+Each API call returns the complete table state, and the client replaces everything rather than tracking deltas. This keeps the rendering logic simple — each view just reads the current state and renders it, without needing to know what changed. It also avoids a whole class of bugs where the client and server get out of sync from missed or partial updates.
+
+---
+
+## Known Limitations
+
+- **SB/BB don't rotate** — the backend always assigns the same seats for blinds. Only the dealer chip rotates (client-side fix). Fixing this properly requires a backend change.
+- **Stack offsets can diverge** — cumulative stack tracking is a client-side approximation. The backend resets stacks each hand, so displayed values may drift from reality over many hands.
+- **No interactive betting** — the backend auto-plays all actions (everyone checks/calls). This is by design per the challenge scope.
+- **Betting actions are simulated** — action badges show what the engine decided, not player input.
+
+---
+
+## Project Structure
+
+```
+unity-client/Assets/
+├── Scripts/
+│   ├── Api/
+│   │   ├── IPokerApi.cs                 # Interface for testability
+│   │   └── PokerApiClient.cs            # UnityWebRequest implementation
+│   ├── Models/
+│   │   ├── GameState.cs                 # Game state + IsShowdown, IsHandComplete
+│   │   ├── PlayerState.cs              # Player state + status helpers
+│   │   ├── TableResponse.cs            # Top-level API wrapper
+│   │   ├── ProcessResponse.cs          # POST /process response
+│   │   ├── HealthResponse.cs           # GET /health response
+│   │   ├── SidePot.cs                  # Side pot model
+│   │   └── Winner.cs                   # Winner model
+│   ├── Managers/
+│   │   ├── GameBootstrap.cs            # Composition root (MonoBehaviour)
+│   │   ├── GameManager.cs             # API orchestration, error handling
+│   │   ├── TableStateManager.cs       # State tracking, dealer fix, stack offsets
+│   │   └── HandHistoryManager.cs      # Action log builder
+│   ├── UI/
+│   │   ├── TableView.cs               # Root table renderer
+│   │   ├── SeatView.cs                # Per-seat: name, stack, cards, chips, actions
+│   │   ├── CardView.cs                # Card rendering (face-up/down/empty)
+│   │   ├── CommunityCardsView.cs      # 5 community card slots
+│   │   ├── HudView.cs                 # Phase label + hand number
+│   │   ├── ControlsView.cs            # Next Step, Auto Play, Speed
+│   │   └── HandHistoryView.cs         # Dropdown action log panel
+│   └── Utils/
+│       ├── CardUtils.cs               # Card string parsing + suit symbols
+│       ├── MoneyFormatter.cs          # Currency formatting ($150.00, +$12.00)
+│       └── PhaseLabels.cs             # Step name → display label mapping
+├── UI/
+│   ├── Templates/
+│   │   └── PokerTable.uxml           # Main layout
+│   └── Styles/
+│       ├── common.uss                 # Theme variables
+│       ├── table.uss                  # Table, felt, controls, history panel
+│       ├── player.uss                 # Seats, position chips, actions
+│       └── card.uss                   # Card face-up/down/empty styles
+├── Tests/EditMode/
+│   ├── CardUtilsTests.cs
+│   ├── MoneyFormatterTests.cs
+│   ├── ModelTests.cs
+│   ├── GameManagerTests.cs
+│   ├── TableStateManagerTests.cs
+│   └── TestData/
+│       ├── table_preflop.json
+│       └── table_showdown.json
+└── Scenes/
+    └── PokerTable.unity
+```
+
+---
+
+## Tests
+
+All tests run in Edit Mode (no Play Mode required):
+
+| Test File | What It Covers |
+|-----------|---------------|
+| CardUtilsTests | Card parsing, suit symbols, colors, display strings |
+| MoneyFormatterTests | Currency formatting with/without sign |
+| ModelTests | JSON deserialization, status properties, showdown detection |
+| GameManagerTests | Connection checks, state loading, step advancement, double-click prevention, error events |
+| TableStateManagerTests | Dealer rotation, stack clamping, state events, hand completion |
+
+---
+
+## Future Work
+
+- WebSocket integration with cash-game-broadcast for real-time state updates instead of request-based polling
+- Card deal and flip animations, pot count-up transitions, stack change tweens
+- Sound effects for card deals, chip movements, and winner announcements
+- Multi-table support with a table selector to connect to different table IDs
+- Interactive betting UI allowing players to fold, call, raise, and go all-in instead of auto-played actions
+- Players with $0 stacks should be sat out and unable to continue playing until they rebuy
+- Additional game types like Blackjack using the same client architecture
+
+---
 
 ## API Reference
 
@@ -132,121 +229,38 @@ The holdem-processor runs at `http://localhost:3030` and exposes three endpoints
 
 ### GET /health
 
-Returns service status.
-
 ```json
-{
-  "service": "holdem-processor",
-  "status": "ok",
-  "timestamp": "2026-02-21T12:00:00.000Z"
-}
+{ "service": "holdem-processor", "status": "ok", "timestamp": "..." }
 ```
 
 ### POST /process
 
-Advances the current hand by one state machine step.
+Advances the hand by one step.
 
-**Request:**
 ```json
-{
-  "tableId": 1
-}
-```
+// Request
+{ "tableId": 1 }
 
-**Response:**
-```json
-{
-  "success": true,
-  "result": {
-    "status": "processed",
-    "tableId": 1,
-    "step": 6,
-    "stepName": "DEAL_FLOP"
-  }
-}
+// Response
+{ "success": true, "result": { "status": "processed", "tableId": 1, "step": 6, "stepName": "DEAL_FLOP" } }
 ```
 
 ### GET /table/{tableId}
 
-Returns the full table state: game info + all player states.
-
-**Response:**
-```json
-{
-  "game": {
-    "id": 1,
-    "tableId": 1,
-    "tableName": "Starter Table",
-    "gameNo": 3,
-    "handStep": 6,
-    "stepName": "DEAL_FLOP",
-    "dealerSeat": 2,
-    "smallBlindSeat": 3,
-    "bigBlindSeat": 4,
-    "communityCards": ["JH", "7D", "2C"],
-    "pot": 3.00,
-    "sidePots": [],
-    "move": 0,
-    "status": "in_progress",
-    "smallBlind": 1.00,
-    "bigBlind": 2.00,
-    "maxSeats": 6,
-    "currentBet": 0,
-    "winners": []
-  },
-  "players": [
-    {
-      "playerId": 1,
-      "username": "Alice",
-      "seat": 1,
-      "stack": 150.00,
-      "bet": 0,
-      "totalBet": 0,
-      "status": "1",
-      "action": "",
-      "cards": ["AH", "KD"],
-      "handRank": "",
-      "winnings": 0
-    },
-    {
-      "playerId": 2,
-      "username": "Bob",
-      "seat": 2,
-      "stack": 149.00,
-      "bet": 0,
-      "totalBet": 1.00,
-      "status": "1",
-      "action": "call",
-      "cards": ["QS", "JC"],
-      "handRank": "",
-      "winnings": 0
-    }
-  ]
-}
-```
+Returns full game + player state. See `Models/` for the C# types that map to this response.
 
 ### Card Format
 
-Cards are strings where the last character is the suit and everything before it is the rank:
+Last character = suit (H/D/C/S), everything before = rank (2-10, J, Q, K, A).
 
-| Card | Rank | Suit | Display |
-|------|------|------|---------|
-| `"AH"` | A | H (Hearts) | A♥ |
-| `"10D"` | 10 | D (Diamonds) | 10♦ |
-| `"2C"` | 2 | C (Clubs) | 2♣ |
-| `"KS"` | K | S (Spades) | K♠ |
+| Card | Display |
+|------|---------|
+| `"AH"` | A♥ |
+| `"10D"` | 10♦ |
+| `"2C"` | 2♣ |
+| `"KS"` | K♠ |
 
-### Player Status Codes
-
-| Code | Meaning | Visual Hint |
-|------|---------|-------------|
-| `"1"` | Active | Normal display |
-| `"11"` | Folded | Dimmed / grayed out |
-| `"12"` | All-In | Highlighted |
-
-### Hand Steps (state machine)
-
-Each `POST /process` call advances one step:
+### Hand Steps
 
 ```
  0: GAME_PREP                  →  Shuffle deck, reset state
@@ -264,20 +278,5 @@ Each `POST /process` call advances one step:
 12: AFTER_RIVER_BETTING_ROUND  →  Prepare for showdown
 13: FIND_WINNERS               →  Evaluate hands
 14: PAY_WINNERS                →  Distribute pot
-15: RECORD_STATS_AND_NEW_HAND  →  Hand complete — next call starts a new hand
+15: RECORD_STATS_AND_NEW_HAND  →  Hand complete
 ```
-
-## Reference Implementation
-
-See `ui/index.html` in the repo root — it's a vanilla JS implementation of exactly what you're building. Study it to understand:
-- How cards are rendered (face-down vs. face-up)
-- When showdown reveal happens (step 12+)
-- How winner highlighting works
-- The auto-play loop logic
-
-## Tips
-
-- **Start simple**: Get a single API call working and rendering one piece of data before building the full table.
-- **Test your models**: Write unit tests that deserialize sample JSON into your C# models — catch issues early.
-- **Use the Inspector**: Make fields `[SerializeField]` so you can tweak API URL, speeds, and other settings without recompiling.
-- **Check the logs**: `Debug.Log` the raw JSON responses to verify you're getting what you expect.
