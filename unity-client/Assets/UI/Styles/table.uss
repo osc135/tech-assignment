@@ -171,3 +171,55 @@
     font-size: 10px;
     padding: 6px 10px;
 }
+
+/* ── Hand History ───────────────────────────── */
+.btn-history {
+    background-color: rgb(85, 85, 85);
+    color: rgb(204, 204, 204);
+}
+
+.btn-history.active {
+    background-color: rgb(33, 150, 243);
+    color: white;
+}
+
+.history-panel {
+    position: absolute;
+    bottom: 40px;
+    right: 0;
+    width: 320px;
+    height: 280px;
+    background-color: rgba(12, 12, 28, 0.95);
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.12);
+    flex-direction: column;
+}
+
+.history-header {
+    padding: 6px 10px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.history-title {
+    font-size: 11px;
+    -unity-font-style: bold;
+    color: var(--color-text-muted);
+}
+
+.history-scroll {
+    flex-grow: 1;
+    padding: 4px 8px;
+}
+
+.history-entry {
+    font-size: 10px;
+    color: var(--color-text);
+    padding: 2px 0;
+    white-space: normal;
+}
+
+.history-spacer {
+    height: 8px;
+}

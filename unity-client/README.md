@@ -20,9 +20,70 @@ docker compose --profile engine up -d
 
 Verify it's running:
 
-```bash
-curl http://localhost:3030/health
-# → {"service":"holdem-processor","status":"ok","timestamp":"..."}
+---
+
+## What's Implemented
+
+### Core Features (P0)
+- 6-seat poker table with player names, stacks, bets, and actions
+- Card rendering with suit symbols and colors (red for hearts/diamonds, black for clubs/spades)
+- Face-down cards during play, revealed face-up at showdown (step 12+)
+- Community cards appearing incrementally (flop/turn/river) with empty placeholders
+- Position chips: Dealer (D, gold), Small Blind (SB, blue), Big Blind (BB, purple)
+- Client-side dealer rotation (rotates based on hand number)
+- Pot display with side pot support
+- Winner highlighting with gold border, hand rank text, and winnings amount
+- Phase label HUD showing current step and hand number
+- Next Step button with double-click prevention
+- Health check on startup with connection status display
+- Error handling for API failures
+- Unit tests: card parsing, model deserialization, money formatting, GameManager, TableStateManager
+
+### Should-Have Features (P1)
+- Auto-play with speed selector (1s, 0.5s, 0.25s, 2s)
+- Hand history log — dropdown panel with step-by-step action log including player actions, community cards, and winner info
+- Cumulative stack tracking across hands (with $0 floor clamping)
+
+### Not Implemented
+- Animations (card flip, pot count-up, stack transitions)
+- Custom card sprites
+- Sound effects
+- Structured API call logging / observability
+- WebSocket integration with cash-game-broadcast
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────┐
+│            UI Layer                 │
+│  TableView, SeatView, CardView,    │
+│  HudView, ControlsView,           │
+│  CommunityCardsView,              │
+│  HandHistoryView                   │
+│  (UXML templates + USS styles)    │
+├─────────────────────────────────────┤
+│         Event System                │
+│  TableStateManager.OnStateChanged   │
+│  TableStateManager.OnHandCompleted  │
+│  GameManager.OnProcessingChanged    │
+│  HandHistoryManager.OnEntries...    │
+├─────────────────────────────────────┤
+│        Manager Layer                │
+│  GameManager (API orchestration)    │
+│  TableStateManager (state + fixes)  │
+│  HandHistoryManager (action log)    │
+│  GameBootstrap (composition root)   │
+├─────────────────────────────────────┤
+│         Domain Models               │
+│  GameState, PlayerState,            │
+│  TableResponse, ProcessResponse     │
+├─────────────────────────────────────┤
+│          API Layer                  │
+│  IPokerApi (interface)              │
+│  PokerApiClient (UnityWebRequest)   │
+└─────────────────────────────────────┘
 ```
 
 ### 2. Create a Unity project

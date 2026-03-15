@@ -11,8 +11,10 @@ namespace HijackPoker.Managers
     {
         private GameManager _gameManager;
         private TableStateManager _stateManager;
+        private HandHistoryManager _historyManager;
         private TableView _tableView;
         private ControlsView _controlsView;
+        private HandHistoryView _historyView;
 
         private bool _autoPlaying;
         private float _autoPlayTimer;
@@ -27,17 +29,22 @@ namespace HijackPoker.Managers
             // Create managers
             _stateManager = new TableStateManager();
             _gameManager = new GameManager(apiClient, _stateManager);
+            _historyManager = new HandHistoryManager();
 
             // Create views
             _tableView = new TableView(root);
+            var controlsContainer = root.Q<VisualElement>(className: "controls");
             _controlsView = new ControlsView(
                 root.Q<Button>("btn-step"),
                 root.Q<Button>("btn-auto"),
                 root.Q<Button>("btn-speed")
             );
+            _historyView = new HandHistoryView(controlsContainer);
 
             // Wire events
             _stateManager.OnStateChanged += state => _tableView.Render(state);
+            _stateManager.OnStateChanged += state => _historyManager.ProcessState(state);
+            _historyManager.OnEntriesChanged += () => _historyView.UpdateEntries(_historyManager.Entries);
 
             _gameManager.OnProcessingChanged += processing =>
                 _controlsView.SetProcessing(processing);
