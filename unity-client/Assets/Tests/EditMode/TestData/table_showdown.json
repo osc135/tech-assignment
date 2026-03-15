@@ -1,0 +1,105 @@
+{
+  "game": {
+    "id": 1,
+    "tableId": 1,
+    "tableName": "Starter Table",
+    "gameNo": 1,
+    "handStep": 14,
+    "stepName": "PAY_WINNERS",
+    "dealerSeat": 1,
+    "smallBlindSeat": 2,
+    "bigBlindSeat": 3,
+    "communityCards": ["JH", "7D", "2C", "KS", "4H"],
+    "pot": 12.00,
+    "sidePots": [],
+    "move": 0,
+    "status": "in_progress",
+    "smallBlind": 1.00,
+    "bigBlind": 2.00,
+    "maxSeats": 6,
+    "currentBet": 0,
+    "winners": [
+      { "seat": 1, "playerId": 1 }
+    ]
+  },
+  "players": [
+    {
+      "playerId": 1,
+      "username": "Alice",
+      "seat": 1,
+      "stack": 162.00,
+      "bet": 0,
+      "totalBet": 4.00,
+      "status": "1",
+      "action": "call",
+      "cards": ["AH", "KD"],
+      "handRank": "Two Pair",
+      "winnings": 12.00
+    },
+    {
+      "playerId": 2,
+      "username": "Bob",
+      "seat": 2,
+      "stack": 146.00,
+      "bet": 0,
+      "totalBet": 4.00,
+      "status": "1",
+      "action": "call",
+      "cards": ["QS", "JC"],
+      "handRank": "Pair",
+      "winnings": 0
+    },
+    {
+      "playerId": 3,
+      "username": "Charlie",
+      "seat": 3,
+      "stack": 146.00,
+      "bet": 0,
+      "totalBet": 4.00,
+      "status": "1",
+      "action": "check",
+      "cards": ["10H", "9D"],
+      "handRank": "High Card",
+      "winnings": 0
+    },
+    {
+      "playerId": 4,
+      "username": "Diana",
+      "seat": 4,
+      "stack": 150.00,
+      "bet": 0,
+      "totalBet": 0,
+      "status": "11",
+      "action": "fold",
+      "cards": ["2C", "7S"],
+      "handRank": "",
+      "winnings": 0
+    },
+    {
+      "playerId": 5,
+      "username": "Eve",
+      "seat": 5,
+      "stack": 146.00,
+      "bet": 0,
+      "totalBet": 4.00,
+      "status": "1",
+      "action": "call",
+      "cards": ["8H", "8D"],
+      "handRank": "Pair",
+      "winnings": 0
+    },
+    {
+      "playerId": 6,
+      "username": "Frank",
+      "seat": 6,
+      "stack": 150.00,
+      "bet": 0,
+      "totalBet": 0,
+      "status": "11",
+      "action": "fold",
+      "cards": ["AS", "AD"],
+      "handRank": "",
+      "winnings": 0
+    }
+  ]
+}

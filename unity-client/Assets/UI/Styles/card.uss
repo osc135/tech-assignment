@@ -1,0 +1,81 @@
+/* Base card (community cards) */
+.card {
+    width: 42px;
+    height: 58px;
+    background-color: white;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
+    border-width: 1px;
+    border-color: rgb(200, 200, 200);
+}
+
+/* Small cards (hole cards in seats) */
+.card-small {
+    width: 30px;
+    height: 42px;
+}
+
+.card-small .card-label {
+    font-size: 11px;
+}
+
+/* Card text */
+.card-label {
+    font-size: 15px;
+    -unity-font-style: bold;
+}
+
+/* Suit colors */
+.card.red .card-label {
+    color: var(--color-red-card);
+}
+
+.card.black .card-label {
+    color: rgb(34, 34, 34);
+}
+
+/* Face-down card */
+.card.face-down {
+    background-color: rgb(30, 40, 120);
+    border-color: rgb(60, 75, 165);
+}
+
+.card.face-down .card-label {
+    display: none;
+}
+
+.card.face-down .card-back {
+    display: flex;
+    border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.12);
+    border-radius: 2px;
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* Size the inner pattern for each card size */
+.card .card-back {
+    width: 28px;
+    height: 40px;
+}
+
+.card-small .card-back {
+    width: 18px;
+    height: 28px;
+}
+
+/* Empty card placeholder */
+.card.empty {
+    background-color: rgba(255, 255, 255, 0.06);
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.card.empty .card-label {
+    display: none;
+}
+
+/* Hide card-back by default (shown only on face-down) */
+.card-back {
+    display: none;
+}

@@ -1,0 +1,115 @@
+/* Player seat — positioning wrapper */
+.seat {
+    position: absolute;
+    align-items: center;
+}
+
+/* Seat positions — ON the felt, near the inner rail.
+   Symmetric: if left seat is at X%, right is at (94% - X%).
+   Panel width ~6% of screen, so 100% - 6% = 94%. */
+.seat-1 { top: 5%;    left: 28%; }
+.seat-2 { top: 5%;    left: 62%; }
+.seat-3 { top: 38%;   left: 83%; }
+.seat-4 { top: 71%;   left: 62%; }
+.seat-5 { top: 71%;   left: 28%; }
+.seat-6 { top: 38%;   left: 8%;  }
+
+/* The unified player panel — contains everything */
+.seat-panel {
+    background-color: rgba(12, 12, 28, 0.9);
+    border-radius: 8px;
+    padding: 6px 12px 8px;
+    align-items: center;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.12);
+    min-width: 100px;
+}
+
+.seat.winner .seat-panel {
+    border-width: 2px;
+    border-color: var(--color-gold);
+}
+
+.seat.folded .seat-panel {
+    opacity: 0.35;
+}
+
+/* Player info */
+.player-name {
+    font-size: 12px;
+    -unity-font-style: bold;
+    color: var(--color-text);
+    margin-bottom: 1px;
+    -unity-text-align: middle-center;
+}
+
+.player-stack {
+    font-size: 10px;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+    -unity-text-align: middle-center;
+}
+
+/* Hole cards row — inside the panel */
+.hole-cards {
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 2px;
+}
+
+.hole-cards .card {
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+/* Bet amount */
+.player-bet {
+    font-size: 10px;
+    color: var(--color-gold);
+    height: 14px;
+    -unity-text-align: middle-center;
+}
+
+/* Action badge */
+.action-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-top: 2px;
+    color: white;
+    -unity-text-align: middle-center;
+}
+
+.action-check  { background-color: rgb(46, 125, 50); }
+.action-call   { background-color: rgb(21, 101, 192); }
+.action-bet    { background-color: rgb(230, 81, 0); }
+.action-raise  { background-color: rgb(230, 81, 0); }
+.action-fold   { background-color: rgb(66, 66, 66); color: rgb(153, 153, 153); }
+.action-allin  { background-color: rgb(183, 28, 28); }
+
+/* Hand rank at showdown */
+.hand-rank {
+    font-size: 9px;
+    color: rgb(79, 195, 247);
+    margin-top: 2px;
+    -unity-text-align: middle-center;
+}
+
+/* Winnings */
+.player-winnings {
+    font-size: 10px;
+    color: var(--color-green);
+    -unity-font-style: bold;
+    margin-top: 2px;
+    -unity-text-align: middle-center;
+}
+
+/* Player states */
+.seat.all-in .player-name {
+    color: var(--color-orange);
+}
+
+/* Hidden seat (empty) */
+.seat.empty {
+    display: none;
+}

@@ -19,7 +19,7 @@ namespace HijackPoker.Api
     /// Uses UnityWebRequest wrapped in async/await via TaskCompletionSource.
     /// Requires Newtonsoft JSON (com.unity.nuget.newtonsoft-json).
     /// </summary>
-    public class PokerApiClient : MonoBehaviour
+    public class PokerApiClient : MonoBehaviour, IPokerApi
     {
         [Header("API Configuration")]
         [SerializeField] private string baseUrl = "http://localhost:3030";
@@ -31,8 +31,7 @@ namespace HijackPoker.Api
         /// </summary>
         public async Task<HealthResponse> GetHealthAsync()
         {
-            // TODO: Implement using SendGetRequest<HealthResponse>("/health")
-            throw new NotImplementedException("Implement GetHealthAsync");
+            return await SendGetRequest<HealthResponse>("/health");
         }
 
         /// <summary>
@@ -41,9 +40,7 @@ namespace HijackPoker.Api
         /// </summary>
         public async Task<ProcessResponse> ProcessStepAsync(int tableId)
         {
-            // TODO: Implement using SendPostRequest<ProcessResponse>
-            // Request body: { "tableId": tableId }
-            throw new NotImplementedException("Implement ProcessStepAsync");
+            return await SendPostRequest<ProcessResponse>("/process", new { tableId });
         }
 
         /// <summary>
@@ -52,8 +49,7 @@ namespace HijackPoker.Api
         /// </summary>
         public async Task<TableResponse> GetTableStateAsync(int tableId)
         {
-            // TODO: Implement using SendGetRequest<TableResponse>($"/table/{tableId}")
-            throw new NotImplementedException("Implement GetTableStateAsync");
+            return await SendGetRequest<TableResponse>($"/table/{tableId}");
         }
 
         // ── HTTP helpers ─────────────────────────────────────────────

@@ -1,0 +1,103 @@
+{
+  "game": {
+    "id": 1,
+    "tableId": 1,
+    "tableName": "Starter Table",
+    "gameNo": 1,
+    "handStep": 5,
+    "stepName": "PRE_FLOP_BETTING_ROUND",
+    "dealerSeat": 1,
+    "smallBlindSeat": 2,
+    "bigBlindSeat": 3,
+    "communityCards": [],
+    "pot": 3.00,
+    "sidePots": [],
+    "move": 4,
+    "status": "in_progress",
+    "smallBlind": 1.00,
+    "bigBlind": 2.00,
+    "maxSeats": 6,
+    "currentBet": 2.00,
+    "winners": []
+  },
+  "players": [
+    {
+      "playerId": 1,
+      "username": "Alice",
+      "seat": 1,
+      "stack": 150.00,
+      "bet": 0,
+      "totalBet": 0,
+      "status": "1",
+      "action": "",
+      "cards": ["AH", "KD"],
+      "handRank": "",
+      "winnings": 0
+    },
+    {
+      "playerId": 2,
+      "username": "Bob",
+      "seat": 2,
+      "stack": 149.00,
+      "bet": 0,
+      "totalBet": 1.00,
+      "status": "1",
+      "action": "call",
+      "cards": ["QS", "JC"],
+      "handRank": "",
+      "winnings": 0
+    },
+    {
+      "playerId": 3,
+      "username": "Charlie",
+      "seat": 3,
+      "stack": 148.00,
+      "bet": 0,
+      "totalBet": 2.00,
+      "status": "1",
+      "action": "",
+      "cards": ["10H", "9D"],
+      "handRank": "",
+      "winnings": 0
+    },
+    {
+      "playerId": 4,
+      "username": "Diana",
+      "seat": 4,
+      "stack": 150.00,
+      "bet": 0,
+      "totalBet": 0,
+      "status": "11",
+      "action": "fold",
+      "cards": ["2C", "7S"],
+      "handRank": "",
+      "winnings": 0
+    },
+    {
+      "playerId": 5,
+      "username": "Eve",
+      "seat": 5,
+      "stack": 150.00,
+      "bet": 0,
+      "totalBet": 0,
+      "status": "1",
+      "action": "call",
+      "cards": ["8H", "8D"],
+      "handRank": "",
+      "winnings": 0
+    },
+    {
+      "playerId": 6,
+      "username": "Frank",
+      "seat": 6,
+      "stack": 150.00,
+      "bet": 0,
+      "totalBet": 0,
+      "status": "12",
+      "action": "allin",
+      "cards": ["AS", "AD"],
+      "handRank": "",
+      "winnings": 0
+    }
+  ]
+}

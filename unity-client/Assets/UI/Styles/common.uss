@@ -1,0 +1,18 @@
+:root {
+    --color-bg: rgb(26, 26, 46);
+    --color-felt: rgb(45, 106, 63);
+    --color-felt-dark: rgb(27, 77, 46);
+    --color-felt-border: rgb(90, 58, 26);
+    --color-text: rgb(238, 238, 238);
+    --color-text-muted: rgb(170, 170, 170);
+    --color-gold: rgb(255, 215, 0);
+    --color-green: rgb(102, 187, 106);
+    --color-red-card: rgb(211, 47, 47);
+    --color-blue: rgb(129, 212, 250);
+    --color-purple: rgb(206, 147, 216);
+    --color-orange: rgb(255, 112, 67);
+    --color-error: rgb(239, 83, 80);
+
+    background-color: var(--color-bg);
+    color: var(--color-text);
+}

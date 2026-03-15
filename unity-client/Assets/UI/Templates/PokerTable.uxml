@@ -1,0 +1,39 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../Styles/common.uss" />
+    <Style src="../Styles/table.uss" />
+    <Style src="../Styles/player.uss" />
+    <Style src="../Styles/card.uss" />
+
+    <ui:VisualElement class="table-root">
+        <!-- Top bar -->
+        <ui:VisualElement class="top-bar">
+            <ui:VisualElement class="top-bar-left">
+                <ui:Label name="title" class="hud-title" text="HIJACK POKER" />
+                <ui:Label name="connection-status" class="connection-status" text="Connecting..." />
+            </ui:VisualElement>
+            <ui:Label name="phase-label" class="hud-phase" text="Connecting..." />
+            <ui:VisualElement class="top-bar-right">
+                <ui:Label name="error-message" class="error-message" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Table area with felt and seats -->
+        <ui:VisualElement name="table-area" class="table-area">
+            <!-- Felt surface -->
+            <ui:VisualElement class="felt">
+                <ui:VisualElement class="felt-inner" />
+                <ui:VisualElement name="community-cards" class="community-cards" />
+                <ui:Label name="pot-label" class="pot-label" />
+            </ui:VisualElement>
+
+            <!-- 6 seat containers (populated by code) -->
+        </ui:VisualElement>
+
+        <!-- Controls — bottom right -->
+        <ui:VisualElement class="controls">
+            <ui:Button name="btn-step" class="btn-step" text="Next Step" />
+            <ui:Button name="btn-auto" class="btn-auto" text="Auto Play" />
+            <ui:Button name="btn-speed" class="btn-speed" text="1s" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
