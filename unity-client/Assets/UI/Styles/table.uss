@@ -100,6 +100,24 @@
     background-color: rgba(255, 255, 255, 0.02);
 }
 
+/* Dealer chip — fixed center top of felt */
+.dealer-chip {
+    position: absolute;
+    top: 24px;
+    align-self: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 14px;
+    font-size: 10px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    background-color: var(--color-gold);
+    color: rgb(30, 30, 30);
+    border-width: 2px;
+    border-color: rgba(0, 0, 0, 0.2);
+    display: none;
+}
+
 /* Community cards area */
 .community-cards {
     flex-direction: row;

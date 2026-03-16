@@ -151,17 +151,11 @@ namespace HijackPoker.UI
 
         private void RenderPositionChip(int seat, GameState game)
         {
-            _positionChip.RemoveFromClassList("chip-dealer");
             _positionChip.RemoveFromClassList("chip-sb");
             _positionChip.RemoveFromClassList("chip-bb");
 
-            if (seat == game.DealerSeat)
-            {
-                _positionChip.text = "D";
-                _positionChip.AddToClassList("chip-dealer");
-                _positionChip.style.display = DisplayStyle.Flex;
-            }
-            else if (seat == game.SmallBlindSeat)
+            // Dealer chip is rendered separately at center-top of felt (TableView)
+            if (seat == game.SmallBlindSeat)
             {
                 _positionChip.text = "SB";
                 _positionChip.AddToClassList("chip-sb");

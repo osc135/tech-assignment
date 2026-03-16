@@ -140,12 +140,6 @@
     background-color: rgb(123, 31, 162);
 }
 
-.chip-dealer {
-    background-color: var(--color-gold);
-    color: rgb(30, 30, 30);
-    border-color: rgba(0, 0, 0, 0.2);
-}
-
 /* Hidden seat (empty) */
 .seat.empty {
     display: none;

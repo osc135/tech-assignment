@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.TestTools;
 using HijackPoker.Api;
 using HijackPoker.Managers;
 using HijackPoker.Models;
@@ -47,6 +49,7 @@ namespace HijackPoker.Tests
 
             await _gameManager.CheckConnection();
 
+            LogAssert.Expect(LogType.Error, "Health check failed: Mock API error");
             Assert.IsFalse(_gameManager.IsConnected);
         }
 
@@ -99,6 +102,7 @@ namespace HijackPoker.Tests
 
             await _gameManager.LoadCurrentState();
 
+            LogAssert.Expect(LogType.Error, "Failed to load table state: Mock API error");
             Assert.IsNotNull(errorMsg);
         }
 
@@ -161,10 +165,11 @@ namespace HijackPoker.Tests
                 Result = new ProcessResult { Status = "processed", TableId = 1, Step = 6 }
             };
             _mockApi.TableResponse = CreateTableResponse(gameNo: 1, handStep: 6);
+            _mockApi.DelayMs = 50; // force async so IsProcessing is still true for task2
 
             // Simulate rapid double-click
             var task1 = _gameManager.AdvanceStep();
-            var task2 = _gameManager.AdvanceStep(); // should be ignored
+            var task2 = _gameManager.AdvanceStep(); // should be ignored — IsProcessing is true
             await Task.WhenAll(task1, task2);
 
             Assert.AreEqual(1, _mockApi.ProcessCallCount);
@@ -184,6 +189,7 @@ namespace HijackPoker.Tests
 
             await _gameManager.AdvanceStep();
 
+            LogAssert.Expect(LogType.Error, "Process step failed: table not found");
             Assert.AreEqual("table not found", errorMsg);
             Assert.AreEqual(0, _mockApi.GetTableCallCount); // should not fetch table
         }
@@ -197,6 +203,7 @@ namespace HijackPoker.Tests
 
             await _gameManager.AdvanceStep();
 
+            LogAssert.Expect(LogType.Error, "AdvanceStep failed: Mock API error");
             Assert.IsNotNull(errorMsg);
             Assert.IsFalse(_gameManager.IsProcessing); // still resets
         }
@@ -269,6 +276,7 @@ namespace HijackPoker.Tests
         public ProcessResponse ProcessResponse;
         public TableResponse TableResponse;
         public bool ShouldThrow;
+        public int DelayMs;
 
         public int ProcessCallCount { get; private set; }
         public int GetTableCallCount { get; private set; }
@@ -281,11 +289,12 @@ namespace HijackPoker.Tests
             return Task.FromResult(HealthResponse);
         }
 
-        public Task<ProcessResponse> ProcessStepAsync(int tableId)
+        public async Task<ProcessResponse> ProcessStepAsync(int tableId)
         {
             ProcessCallCount++;
             if (ShouldThrow) throw new Exception("Mock API error");
-            return Task.FromResult(ProcessResponse);
+            if (DelayMs > 0) await Task.Delay(DelayMs);
+            return ProcessResponse;
         }
 
         public Task<TableResponse> GetTableStateAsync(int tableId)

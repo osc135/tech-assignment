@@ -22,19 +22,32 @@ curl http://localhost:3030/health
 # 4. Hit Play in the Unity Editor
 ```
 
-The poker table connects to the backend automatically, shows connection status, and is ready to play.
+The poker table connects to the backend automatically and shows connection status. Click "Next Step" or "Auto Play" to start watching hands.
+
+---
+
+## What This Is
+
+A **spectator/viewer client** — not an interactive poker game. The backend engine makes all betting decisions automatically (players check, call, fold, etc. on their own). This client visualizes what the engine is doing, step by step, through a 16-step hand state machine.
+
+You can:
+- **Step through hands** one state at a time with "Next Step"
+- **Auto-play** hands continuously at configurable speeds (0.25s, 0.5s, 1s, 2s)
+- **Watch** cards get dealt, bets posted, community cards revealed, and winners paid out
+- **Review** a running hand history log of what happened each step
+
+You cannot fold, call, raise, or make any betting decisions — that would require interactive betting UI and backend changes that are out of scope for this challenge.
 
 ---
 
 ## What's Implemented
 
 ### Core Features (P0)
-- 6-seat poker table with player names, stacks, bets, and actions
+- 6-seat poker table displaying player names, stacks, bets, and engine-decided actions
 - Card rendering with suit symbols and colors (red for hearts/diamonds, black for clubs/spades)
 - Face-down cards during play, revealed face-up at showdown (step 12+)
 - Community cards appearing incrementally (flop/turn/river) with empty placeholders
-- Position chips: Dealer (D, gold), Small Blind (SB, blue), Big Blind (BB, purple)
-- Client-side dealer rotation (rotates based on hand number)
+- Position chips: Dealer (D, gold, fixed center-top of felt), Small Blind (SB, blue), Big Blind (BB, purple)
 - Pot display with side pot support
 - Winner highlighting with gold border, hand rank text, and winnings amount
 - Phase label HUD showing current step and hand number
@@ -49,6 +62,7 @@ The poker table connects to the backend automatically, shows connection status, 
 - Cumulative stack tracking across hands (with $0 floor clamping)
 
 ### Not Implemented
+- Interactive betting (fold, call, raise, all-in) — the engine auto-plays all decisions
 - Animations (card flip, pot count-up, stack transitions)
 - Custom card sprites
 - Sound effects
@@ -122,9 +136,9 @@ GameManager, TableStateManager, and HandHistoryManager are plain C# classes. Onl
 
 IPokerApi lets GameManager depend on an abstraction instead of the concrete PokerApiClient. This is what makes the GameManager tests possible — they inject a MockPokerApi that returns preset responses, so tests run without a backend or network. It also means swapping the HTTP implementation later (e.g., for WebSocket-based updates) wouldn't require changing any game logic.
 
-### Client-Side Dealer Rotation
+### Dealer Chip Placement
 
-The backend has a bug where `dealer_seat` resets to 1 on every new game, so the dealer never rotates. Rather than modifying the backend (out of scope), the client computes the correct dealer position from `gameNo`: `dealerIndex = (gameNo - 1) % playerCount`. SB/BB are not corrected client-side since the backend controls who actually posts the blinds.
+The dealer chip (D) is fixed at the center-top of the felt rather than floating next to a specific seat. The backend has a bug where `dealer_seat` resets to 1 on every new game, so rotating the chip between seats would be misleading. The client still computes the correct dealer index from `gameNo` (`dealerIndex = (gameNo - 1) % playerCount`) for internal state, but visually the chip stays put. SB/BB chips float next to their respective seats since the backend controls who actually posts the blinds.
 
 ### Full State Replace
 
@@ -134,10 +148,10 @@ Each API call returns the complete table state, and the client replaces everythi
 
 ## Known Limitations
 
+- **Spectator only** — there is no way to fold, call, raise, or make any betting decisions. The backend engine auto-plays all actions and this client just visualizes the results.
 - **SB/BB don't rotate** — the backend always assigns the same seats for blinds. Only the dealer chip rotates (client-side fix). Fixing this properly requires a backend change.
 - **Stack offsets can diverge** — cumulative stack tracking is a client-side approximation. The backend resets stacks each hand, so displayed values may drift from reality over many hands.
-- **No interactive betting** — the backend auto-plays all actions (everyone checks/calls). This is by design per the challenge scope.
-- **Betting actions are simulated** — action badges show what the engine decided, not player input.
+- **Action badges reflect engine decisions** — badges like CHECK, CALL, FOLD show what the engine decided, not player input.
 
 ---
 

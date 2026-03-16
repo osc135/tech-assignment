@@ -22,6 +22,7 @@
             <!-- Felt surface -->
             <ui:VisualElement class="felt">
                 <ui:VisualElement class="felt-inner" />
+                <ui:Label name="dealer-chip" class="dealer-chip" />
                 <ui:VisualElement name="community-cards" class="community-cards" />
                 <ui:Label name="pot-label" class="pot-label" />
             </ui:VisualElement>

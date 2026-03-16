@@ -10,6 +10,7 @@ namespace HijackPoker.UI
     {
         private readonly VisualElement _tableArea;
         private readonly Label _potLabel;
+        private readonly Label _dealerChip;
         private readonly CommunityCardsView _communityCards;
         private readonly HudView _hud;
         private readonly Dictionary<int, SeatView> _seats = new();
@@ -18,6 +19,7 @@ namespace HijackPoker.UI
         {
             _tableArea = root.Q<VisualElement>("table-area");
             _potLabel = root.Q<Label>("pot-label");
+            _dealerChip = root.Q<Label>("dealer-chip");
 
             var communityContainer = root.Q<VisualElement>("community-cards");
             _communityCards = new CommunityCardsView(communityContainer);
@@ -48,6 +50,17 @@ namespace HijackPoker.UI
 
             // HUD
             _hud.Render(game);
+
+            // Dealer chip — fixed at center top of felt
+            if (_dealerChip != null && game.DealerSeat > 0)
+            {
+                _dealerChip.text = "D";
+                _dealerChip.style.display = DisplayStyle.Flex;
+            }
+            else if (_dealerChip != null)
+            {
+                _dealerChip.style.display = DisplayStyle.None;
+            }
 
             // Pot
             _potLabel.text = game.Pot > 0 ? $"Pot: {MoneyFormatter.Format(game.Pot)}" : "";
